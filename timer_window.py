@@ -1,32 +1,8 @@
 """
 This file is a heavily modified version of https://github.com/PySimpleGUI/PySimpleGUI/blob/master/DemoPrograms/Demo_Desktop_Widget_Timer.py
 
-The original code is licensed under the GNU Lesser General Public License v3.0 (
-This means that we can use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the original code, as long as we give credit to the original author and include the license in our final product.
-
----
-
-MIT License
-
-Copyright (c) 2019 Rockikz
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+The original code is licensed under the GNU Lesser General Public License v3.0 (https://github.com/PySimpleGUI/PySimpleGUI/blob/master/license.txt).
+This means that we can use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the original code, as long as we include the original License and copyright notice, Disclose source, State changes, and the project is licensed under the Same license.
 """
 
 import PySimpleGUI as sg
@@ -47,8 +23,8 @@ layout = [[sg.Text('')],
            sg.Exit(button_color=('white', 'firebrick4'), key='Exit')]]
 
 window = sg.Window('Running Timer', layout,
-                   no_titlebar=True,
-                   auto_size_buttons=False,
+                   no_titlebar=False,
+                   auto_size_buttons=True,
                    keep_on_top=True,
                    grab_anywhere=True,
                    element_padding=(0, 0),
@@ -64,8 +40,10 @@ while True:
     if not paused:
         event, values = window.read(timeout=10)
         current_time = time_as_int() - start_time
+        # print(event, values)
     else:
         event, values = window.read()
+        # print(event, values)
     # --------- Do Button Operations --------
     if event in (sg.WIN_CLOSED, 'Exit'):        # ALWAYS give a way out of program
         break

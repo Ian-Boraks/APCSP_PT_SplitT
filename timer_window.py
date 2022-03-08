@@ -74,13 +74,10 @@ while True:
             start_time = start_time + time_as_int() - paused_time
     elif event == '-SPLIT-TIMER-':
         user_times.append(current_time)
-        runNumber = 2
+        runNumber = 0
         currentF = open('current_run.csv', 'a+')
-        time_list = [1, 2, 3, 4, 5,]
+        currentF.writelines(str(runNumber) + ", " + str(user_times[-1]) + "\n")
 
-        # currentF.writelines("run " + str(runNumber) + "\n")
-        for i in time_list:
-            currentF.writelines(str(i) + ", run"  + str(runNumber) + "\n") 
         window['-SPLIT-TEXT-'].update(user_times)
         # Change button's text
         window['-RUN-PAUSE-'].update('Run' if paused else 'Pause')

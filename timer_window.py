@@ -5,6 +5,7 @@ The original code is licensed under the GNU Lesser General Public License v3.0 (
 This means that we can use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the original code, as long as we include the original License and copyright notice, Disclose source, State changes, and the project is licensed under the Same license.
 """
 
+import split_watcher as sw
 import PySimpleGUI as sg
 import time
 

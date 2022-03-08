@@ -5,8 +5,6 @@ The original code is licensed under the MIT license (https://github.com/x4nth055
 This means that we can use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the original code, as long as we give credit to the original author and include the license in our final product.
 """
 
-
-import re
 import keyboard
 import asyncio
 
@@ -50,10 +48,6 @@ class splitWatcher:
 
     
 if __name__ == "__main__":
-  # if you want a keylogger to send to your email
-  # keylogger = Keylogger(interval=SEND_REPORT_EVERY, report_method="email")
-  # if you want a keylogger to record keylogs to a local file 
-  # (and then send it using your favorite method)
   split = splitWatcher()
   asyncio.run(split.start())
   print("Split Key Watcher | OFF")

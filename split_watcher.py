@@ -10,20 +10,23 @@ import asyncio
 from types import MethodType
 
 class splitWatcher:
-  def __init__(self,  splitFunction: MethodType.__func__, split_key = "=", exit_key = "~"):
-    print("Split Key Watcher | ON")
+  def __init__(self,  splitFunction: MethodType.__func__, endFunction: MethodType.__func__, split_key = "=", exit_key = "~"):
+    print("Split Key Watcher | Setting Up")
     self.splitFunction = splitFunction
+    self.endFunction = endFunction
 
     # TODO: make this configurable with pysimple GUI
-    self.split_key = input("Enter the key to split: ")
-    self.exit_key = input("Enter the key to exit the program: ")
+    self.split_key = split_key 
+    self.exit_key = exit_key
 
     self.setup = False
     self.exit_program = False
+    print("Split Key Watcher | Setup Complete")
 
   def callback(self, event):
     name = event.name
     if self.exit_program:
+      self.endFunction()
       self.exit_program = True
       del self
     elif name == self.split_key:
@@ -40,18 +43,9 @@ class splitWatcher:
     return 1
        
   async def start(self):
+    print("Split Key Watcher | Starting")
     # start the keylogger
     keyboard.on_release(callback=self.callback)
     # block the current thread, wait until CTRL+C is pressed
     await self.endProgram()
-
     print("END")
-
-def split_function():
-  return 0
-
-if __name__ == "__main__":
-  split = splitWatcher(split_function)
-  asyncio.run(split.start())
-  print("Split Key Watcher | OFF")
-  del split

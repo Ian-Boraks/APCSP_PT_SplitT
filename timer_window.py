@@ -5,12 +5,15 @@ The original code is licensed under the GNU Lesser General Public License v3.0 (
 This means that we can use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the original code, as long as we include the original License and copyright notice, Disclose source, State changes, and the project is licensed under the Same license.
 """
 
+import _thread
+import asyncio
 import split_watcher as sw
 import PySimpleGUI as sg
 import time
 
 
 user_times = []
+runNumber = 0
 
 def time_as_int():
     return int(round(time.time() * 100))
@@ -18,6 +21,24 @@ def format_time():
     return window['-TIMER-TEXT-'].update('{:02d}:{:02d}.{:02d}'.format((current_time // 100) // 60,
                                                         (current_time // 100) % 60,
                                                         current_time % 100))
+
+def callOnSplit():
+  user_times.append(current_time)
+  currentF = open('current_run.csv', 'a+')
+  currentF.writelines(str(runNumber) + ", " + str(user_times[-1]) + "\n")
+  currentF.close()
+
+def endSplitWatch():
+  print("help")
+  # splitWatch.exit_program = True
+  # splitWatchThread.join()
+
+splitWatch = sw.splitWatcher(callOnSplit, endSplitWatch)
+
+def startSplitWatch():
+  asyncio.run(splitWatch.start())
+
+_thread.start_new_thread(startSplitWatch, ())
 
 # ----------------  Create Form  ----------------
 sg.theme('Black')
@@ -47,12 +68,19 @@ window = sg.Window('Running Timer', layout,
 current_time, paused_time, paused = 0, 0, False
 start_time = time_as_int()
 
-while True:
-    def format_time():
-        return window['-TIMER-TEXT-'].update('{:02d}:{:02d}.{:02d}'.format((current_time // 100) // 60,
-                                                        (current_time // 100) % 60,
-                                                        current_time % 100))
-    # --------- Read and update window --------
+def format_time():
+    return window['-TIMER-TEXT-'].update('{:02d}:{:02d}.{:02d}'.format((current_time // 100) // 60,
+                                                    (current_time // 100) % 60,
+                                                    current_time % 100))
+
+def main():
+  global paused_time
+  global current_time
+  global paused
+  global start_time
+
+  while True:
+  # --------- Read and update window --------
     if not paused:
         event, values = window.read(timeout=10)
         current_time = time_as_int() - start_time
@@ -62,6 +90,8 @@ while True:
         # print(event, values)
     # --------- Do Button Operations --------
     if event in (sg.WIN_CLOSED, 'Exit'):        # ALWAYS give a way out of program
+        splitWatch.exit_program = True
+        del splitWatch
         break
     if event == '-RESET-':
         paused_time = start_time = time_as_int()
@@ -74,9 +104,6 @@ while True:
             start_time = start_time + time_as_int() - paused_time
     elif event == '-SPLIT-TIMER-':
         user_times.append(current_time)
-        runNumber = 0
-        currentF = open('current_run.csv', 'a+')
-        currentF.writelines(str(runNumber) + ", " + str(user_times[-1]) + "\n")
 
         window['-SPLIT-TEXT-'].update(user_times)
         # Change button's text
@@ -86,5 +113,5 @@ while True:
     # --------- Display timer in window --------
     format_time()
 
-
-window.close()
+if __name__ == "__main__":
+  main()

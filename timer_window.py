@@ -8,17 +8,24 @@ This means that we can use, copy, modify, merge, publish, distribute, sublicense
 import PySimpleGUI as sg
 import time
 
-def time_as_int():
-    return int(round(time.time() * 100))
 
 user_times = []
+
+def time_as_int():
+    return int(round(time.time() * 100))
+def format_time():
+    return window['-TIMER-TEXT-'].update('{:02d}:{:02d}.{:02d}'.format((current_time // 100) // 60,
+                                                        (current_time // 100) % 60,
+                                                        current_time % 100))
+
 # ----------------  Create Form  ----------------
 sg.theme('Black')
 
 layout = [[sg.Text('')],
           [sg.Text('', size=(8, 2), font=('Helvetica', 20),
                 justification='center', key='-TIMER-TEXT-'),
-           sg.Text(''), size=(8, 2), font=('Helvetica', 20), justification='center', key='-SPLIT-TEXT-'],
+           sg.Text('', size=(8, 2), font=('Helvetica', 20), 
+                justification='center', key='-SPLIT-TEXT-')],
           [sg.Button('Pause', key='-RUN-PAUSE-', button_color=('white', '#001480')),
            sg.Button('Reset', button_color=('white', '#007339'), key='-RESET-'),
            sg.Exit(button_color=('white', 'firebrick4'), key='Exit'), 
@@ -40,6 +47,10 @@ current_time, paused_time, paused = 0, 0, False
 start_time = time_as_int()
 
 while True:
+    def format_time():
+        return window['-TIMER-TEXT-'].update('{:02d}:{:02d}.{:02d}'.format((current_time // 100) // 60,
+                                                        (current_time // 100) % 60,
+                                                        current_time % 100))
     # --------- Read and update window --------
     if not paused:
         event, values = window.read(timeout=10)
@@ -62,13 +73,20 @@ while True:
             start_time = start_time + time_as_int() - paused_time
     elif event == '-SPLIT-TIMER-':
         user_times.append(current_time)
+        runNumber = 2
+        currentF = open('current_run.csv', 'a+')
+        time_list = [1, 2, 3, 4, 5,]
+
+        # currentF.writelines("run " + str(runNumber) + "\n")
+        for i in time_list:
+            currentF.writelines(str(i) + ", run"  + str(runNumber) + "\n") 
         window['-SPLIT-TEXT-'].update(user_times)
         # Change button's text
         window['-RUN-PAUSE-'].update('Run' if paused else 'Pause')
     elif event == 'Edit Me':
         sg.execute_editor(__file__)
     # --------- Display timer in window --------
-    window['-TIMER-TEXT-'].update('{:02d}:{:02d}.{:02d}'.format((current_time // 100) // 60,
-                                                        (current_time // 100) % 60,
-                                                        current_time % 100))
+    format_time()
+
+
 window.close()

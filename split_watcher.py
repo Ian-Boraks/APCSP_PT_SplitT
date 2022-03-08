@@ -7,10 +7,12 @@ This means that we can use, copy, modify, merge, publish, distribute, sublicense
 
 import keyboard
 import asyncio
+from types import MethodType
 
 class splitWatcher:
-  def __init__(self):
+  def __init__(self,  splitFunction: MethodType.__func__, split_key = "=", exit_key = "~"):
     print("Split Key Watcher | ON")
+    self.splitFunction = splitFunction
 
     # TODO: make this configurable with pysimple GUI
     self.split_key = input("Enter the key to split: ")
@@ -21,14 +23,13 @@ class splitWatcher:
 
   def callback(self, event):
     name = event.name
-    if self.split_key == '!@#$%^&*()': 
-      self.split_key = name
-    elif self.exit_program:
+    if self.exit_program:
       self.exit_program = True
       del self
     elif name == self.split_key:
       # TODO: Integrate this with pysimple GUI to save the current time to a csv file
       print(self.split_key + " | was pressed and you have split")
+      self.splitFunction()
     elif name == self.exit_key:
       print(self.exit_key + " | was pressed and you have exited the program")
       self.exit_program = True
@@ -37,7 +38,7 @@ class splitWatcher:
     while not self.exit_program:
       await asyncio.sleep(0.1)
     return 1
-      
+       
   async def start(self):
     # start the keylogger
     keyboard.on_release(callback=self.callback)
@@ -46,9 +47,11 @@ class splitWatcher:
 
     print("END")
 
-    
+def split_function():
+  return 0
+
 if __name__ == "__main__":
-  split = splitWatcher()
+  split = splitWatcher(split_function)
   asyncio.run(split.start())
   print("Split Key Watcher | OFF")
   del split

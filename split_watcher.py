@@ -10,7 +10,7 @@ import asyncio
 from types import MethodType
 
 class splitWatcher:
-  def __init__(self,  splitFunction: MethodType.__func__, endFunction: MethodType.__func__, split_key = "=", exit_key = "~"):
+  def __init__(self,  splitFunction: MethodType.__func__, endFunction: MethodType.__func__, window, split_key = "=", exit_key = "~"):
     print("Split Key Watcher | Setting Up")
     self.splitFunction = splitFunction
     self.endFunction = endFunction
@@ -19,6 +19,8 @@ class splitWatcher:
     self.split_key = split_key 
     self.exit_key = exit_key
 
+    self.window = window
+
     self.setup = False
     self.exit_program = False
     print("Split Key Watcher | Setup Complete")
@@ -26,11 +28,13 @@ class splitWatcher:
   def callback(self, event):
     name = event.name
     if self.exit_program:
+      self.window.write_event_value('Exit', 0)
       self.endFunction()
       self.exit_program = True
       del self
     elif name == self.split_key:
       # TODO: Integrate this with pysimple GUI to save the current time to a csv file
+      self.window.write_event_value('-SPLIT-TIMER-', 0)
       print(self.split_key + " | was pressed and you have split")
       self.splitFunction()
     elif name == self.exit_key:

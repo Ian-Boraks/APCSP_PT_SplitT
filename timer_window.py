@@ -13,7 +13,7 @@ import time
 
 
 user_times = []
-runNumber = 0
+splitNumber = 0
 
 def time_as_int():
     return int(round(time.time() * 100))
@@ -25,20 +25,16 @@ def format_time():
 def callOnSplit():
   user_times.append(current_time)
   currentF = open('current_run.csv', 'a+')
-  currentF.writelines(str(runNumber) + ", " + str(user_times[-1]) + "\n")
+#   currentF.writelines(str(splitNumber) + ", " + str(user_times[-1]) + "\n")
+  currentF.writelines(str(splitNumber) + ", " + str(current_time) + "\n")
+
   currentF.close()
 
 def endSplitWatch():
-  print("help")
-  # splitWatch.exit_program = True
-  # splitWatchThread.join()
-
-splitWatch = sw.splitWatcher(callOnSplit, endSplitWatch)
-
-def startSplitWatch():
-  asyncio.run(splitWatch.start())
-
-_thread.start_new_thread(startSplitWatch, ())
+  print("endSplitWatch")
+#   splitWatch.exit_program = True
+#   splitWatchThread.join()
+  exit()
 
 # ----------------  Create Form  ----------------
 sg.theme('Black')
@@ -65,7 +61,14 @@ window = sg.Window('Running Timer', layout,
                    size = (500, 500),
                    resizable = True)
 
-current_time, paused_time, paused = 0, 0, False
+splitWatch = sw.splitWatcher(callOnSplit, endSplitWatch, window)
+
+def startSplitWatch():
+  asyncio.run(splitWatch.start())
+
+_thread.start_new_thread(startSplitWatch, ())
+
+current_time, paused_time, paused = 0, 0, True
 start_time = time_as_int()
 
 def format_time():
@@ -73,11 +76,63 @@ def format_time():
                                                     (current_time // 100) % 60,
                                                     current_time % 100))
 
+def doEventWindows(event):
+    global paused_time
+    global current_time
+    global paused
+    global start_time
+    global splitNumber
+
+    match event:
+        case sg.WIN_CLOSED | 'Exit':
+            splitWatch.exit_program = True
+            del splitWatch
+            print('Exit')
+            return True
+        case '-RESET-':
+            paused_time = start_time = time_as_int()
+            current_time = 0
+            splitNumber = 0
+            window['-SPLIT-TEXT-'].update('{:02d}:{:02d}.{:02d}'.format((current_time // 100) // 60,
+                                                            (current_time // 100) % 60,
+                                                            current_time % 100))
+            format_time()
+            print('Reset')
+            if not paused: 
+                doEventWindows('-RUN-PAUSE-')
+            return False
+        case '-RUN-PAUSE-':
+            paused = not paused
+            if paused:
+                paused_time = time_as_int()
+            else:
+                start_time = start_time + time_as_int() - paused_time
+            print('Run or Pause')
+            return False
+        case '-SPLIT-TIMER-':
+            if (splitNumber == 0 and paused):
+                doEventWindows('-RUN-PAUSE-')
+                return False
+            elif (paused):
+                return False
+            else:    
+                callOnSplit()
+                splitNumber += 1
+                window['-SPLIT-TEXT-'].update('{:02d}:{:02d}.{:02d}'.format((current_time // 100) // 60,
+                                                            (current_time // 100) % 60,
+                                                            current_time % 100))
+                # Change button's text
+                window['-RUN-PAUSE-'].update('Run' if paused else 'Pause')
+                print('Split')
+            return False
+
 def main():
   global paused_time
   global current_time
   global paused
   global start_time
+  global splitNumber
+  doEventWindows('-RESET-')
 
   while True:
   # --------- Read and update window --------
@@ -87,29 +142,38 @@ def main():
         # print(event, values)
     else:
         event, values = window.read()
-        # print(event, values)
+        print(event, values)
     # --------- Do Button Operations --------
-    if event in (sg.WIN_CLOSED, 'Exit'):        # ALWAYS give a way out of program
-        splitWatch.exit_program = True
-        del splitWatch
+   
+    if doEventWindows(event):
         break
-    if event == '-RESET-':
-        paused_time = start_time = time_as_int()
-        current_time = 0
-    elif event == '-RUN-PAUSE-':
-        paused = not paused
-        if paused:
-            paused_time = time_as_int()
-        else:
-            start_time = start_time + time_as_int() - paused_time
-    elif event == '-SPLIT-TIMER-':
-        user_times.append(current_time)
+            
+    # if event in (sg.WIN_CLOSED, 'Exit'):        # ALWAYS give a way out of program
+    #     # splitWatch.exit_program = True
+    #     # del splitWatch
+    #     break
+    # if event == '-RESET-':
+    #     paused_time = start_time = time_as_int()
+    #     current_time = 0
+    #     splitNumber = 0
+    # elif event == '-RUN-PAUSE-':
+    #     paused = not paused
+    #     if paused:
+    #         paused_time = time_as_int()
+    #     else:
+    #         start_time = start_time + time_as_int() - paused_time
+    # elif event == '-SPLIT-TIMER-':
+    #     # user_times.append('{:02d}:{:02d}.{:02d}'.format((current_time // 100) // 60,
+    #     #                                             (current_time // 100) % 60,
+    #     #                                             current_time % 100))
+    #     callOnSplit()
 
-        window['-SPLIT-TEXT-'].update(user_times)
-        # Change button's text
-        window['-RUN-PAUSE-'].update('Run' if paused else 'Pause')
-    elif event == 'Edit Me':
-        sg.execute_editor(__file__)
+    #     splitNumber += 1
+    #     window['-SPLIT-TEXT-'].update('{:02d}:{:02d}.{:02d}'.format((current_time // 100) // 60,
+    #                                                  (current_time // 100) % 60,
+    #                                                  current_time % 100))
+    #     # Change button's text
+    #     window['-RUN-PAUSE-'].update('Run' if paused else 'Pause')
     # --------- Display timer in window --------
     format_time()
 

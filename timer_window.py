@@ -147,34 +147,7 @@ def main():
    
     if doEventWindows(event):
         break
-            
-    # if event in (sg.WIN_CLOSED, 'Exit'):        # ALWAYS give a way out of program
-    #     # splitWatch.exit_program = True
-    #     # del splitWatch
-    #     break
-    # if event == '-RESET-':
-    #     paused_time = start_time = time_as_int()
-    #     current_time = 0
-    #     splitNumber = 0
-    # elif event == '-RUN-PAUSE-':
-    #     paused = not paused
-    #     if paused:
-    #         paused_time = time_as_int()
-    #     else:
-    #         start_time = start_time + time_as_int() - paused_time
-    # elif event == '-SPLIT-TIMER-':
-    #     # user_times.append('{:02d}:{:02d}.{:02d}'.format((current_time // 100) // 60,
-    #     #                                             (current_time // 100) % 60,
-    #     #                                             current_time % 100))
-    #     callOnSplit()
-
-    #     splitNumber += 1
-    #     window['-SPLIT-TEXT-'].update('{:02d}:{:02d}.{:02d}'.format((current_time // 100) // 60,
-    #                                                  (current_time // 100) % 60,
-    #                                                  current_time % 100))
-    #     # Change button's text
-    #     window['-RUN-PAUSE-'].update('Run' if paused else 'Pause')
-    # --------- Display timer in window --------
+      
     format_time()
 
 if __name__ == "__main__":
